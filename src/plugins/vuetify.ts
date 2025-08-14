@@ -48,8 +48,4 @@ export default createVuetify({
       rounded: 'lg',
     },
   },
-  // Custom font family
-  global: {
-    ripple: false,
-  },
 })
