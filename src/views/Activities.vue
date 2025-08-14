@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-space-between align-center mb-6">
-            <h1 class="text-h3">إدارة أنواع الأنشطة</h1>
+            <h1 class="text-h3">إداره أنواع الأنشطة</h1>
             <v-btn color="primary" prepend-icon="mdi-plus" @click="showCreateDialog = true">
               إضافة نشاط جديد
             </v-btn>
