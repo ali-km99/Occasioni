@@ -112,10 +112,19 @@ export const reservationTypesAPI = {
 
 // Activity Types API
 export const activityTypesAPI = {
-  getAll: () => api.get<ActivityType[]>('/typeOfActivities'),
+  getAll: (params?: { page?: number; limit?: number; status?: number }) => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.status) queryParams.append('status', params.status.toString())
+
+    const queryString = queryParams.toString()
+    const url = queryString ? `/typeOfActivities/all?${queryString}` : '/typeOfActivities/all'
+    return api.get<PaginatedResponse<ActivityType>>(url)
+  },
   getById: (id: string) => api.get<ActivityType>(`/typeOfActivities/${id}`),
   create: (data: ActivityTypeCreate) => api.post<ActivityType>('/typeOfActivities', data),
-  update: (id: string, data: ActivityTypeUpdate) =>
+  update: (id: string, data: ActivityTypeCreate) =>
     api.patch<ActivityType>(`/typeOfActivities/${id}`, data),
   delete: (id: string) => api.delete(`/typeOfActivities/${id}`),
   block: (id: string) => api.post(`/typeOfActivities/${id}/block`),

@@ -308,14 +308,19 @@ const hallForm = reactive<HallCreate>({
 const isValid = ref(false)
 
 // Table headers
-const headers = [
-  { title: 'الصورة', key: 'path', sortable: false },
-  { title: 'الاسم', key: 'name', sortable: true },
-  { title: 'رقم الهاتف', key: 'phoneNumber', sortable: true },
-  { title: 'الموقع', key: 'location', sortable: true },
-  { title: 'نوع النشاط', key: 'typeOfActivityName', sortable: true },
-  { title: 'الحالة', key: 'status', sortable: true },
-  { title: 'الإجراءات', key: 'actions', sortable: false },
+const headers: Array<{
+  title: string
+  key: string
+  sortable: boolean
+  align?: 'start' | 'center' | 'end'
+}> = [
+  { title: 'الصورة', key: 'path', sortable: false, align: 'center' },
+  { title: 'الاسم', key: 'name', sortable: true, align: 'center' },
+  { title: 'رقم الهاتف', key: 'phoneNumber', sortable: true, align: 'center' },
+  { title: 'الموقع', key: 'location', sortable: true, align: 'center' },
+  { title: 'نوع النشاط', key: 'typeOfActivityName', sortable: true, align: 'center' },
+  { title: 'الحالة', key: 'status', sortable: true, align: 'center' },
+  { title: 'الإجراءات', key: 'actions', sortable: false, align: 'center' },
 ]
 
 // Filter options
@@ -364,7 +369,7 @@ const fetchHalls = async (page: number = 1) => {
 const fetchActivityTypes = async () => {
   try {
     const response = await activityTypesAPI.getAll()
-    activityTypes.value = response.data
+    activityTypes.value = response.data.data
   } catch (error) {
     console.error('Error fetching activity types:', error)
   }

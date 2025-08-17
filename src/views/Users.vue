@@ -267,12 +267,12 @@ const isValid = ref(false)
 
 // Table headers
 const headers = [
-  { title: 'الصورة', key: 'avatar', sortable: false },
-  { title: 'الاسم', key: 'name', sortable: true },
-  { title: 'البريد الإلكتروني', key: 'email', sortable: true },
-  { title: 'الدور', key: 'role', sortable: true },
-  { title: 'الحالة', key: 'status', sortable: true },
-  { title: 'الإجراءات', key: 'actions', sortable: false },
+  { title: 'الصورة', key: 'avatar', sortable: false, align: 'center' as const },
+  { title: 'الاسم', key: 'name', sortable: true, align: 'center' as const },
+  { title: 'البريد الإلكتروني', key: 'username', sortable: true, align: 'center' as const },
+  { title: 'الدور', key: 'isAdmin', sortable: true, align: 'center' as const },
+  { title: 'الحالة', key: 'status', sortable: true, align: 'center' as const },
+  { title: 'الإجراءات', key: 'actions', sortable: false, align: 'center' as const },
 ]
 
 // Filter options

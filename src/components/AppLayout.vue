@@ -1,12 +1,7 @@
 <template>
   <v-app>
     <!-- Navigation Drawer -->
-    <v-navigation-drawer
-      v-model="drawer"
-      :rail="rail"
-      permanent
-      @click="rail = false"
-    >
+    <v-navigation-drawer v-model="drawer" :rail="rail" permanent @click="rail = false">
       <v-list-item
         prepend-avatar="https://randomuser.me/api/portraits/men/85.jpg"
         :title="authStore.user?.name || 'المستخدم'"
@@ -14,10 +9,7 @@
         nav
       >
         <template v-slot:append>
-          <v-btn
-            variant="text"
-            @click.stop="rail = !rail"
-          >
+          <v-btn variant="text" @click.stop="rail = !rail">
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
         </template>
@@ -32,28 +24,28 @@
           value="dashboard"
           to="/dashboard"
         ></v-list-item>
-        
+
         <v-list-item
           prepend-icon="mdi-domain"
           title="القاعات"
           value="halls"
           to="/halls"
         ></v-list-item>
-        
+
         <v-list-item
           prepend-icon="mdi-calendar-clock"
-          title="أنواع الحجوزات"
+          title="أنواع الأنشطة"
           value="reservation-types"
           to="/reservation-types"
         ></v-list-item>
-        
+
         <v-list-item
           prepend-icon="mdi-account-group"
           title="الأنشطة"
           value="activities"
           to="/activities"
         ></v-list-item>
-        
+
         <v-list-item
           prepend-icon="mdi-account-multiple"
           title="المستخدمين"
@@ -68,13 +60,10 @@
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>إدارة حجز القاعات</v-toolbar-title>
       <v-spacer></v-spacer>
-      
+
       <v-menu>
         <template v-slot:activator="{ props }">
-          <v-btn
-            icon
-            v-bind="props"
-          >
+          <v-btn icon v-bind="props">
             <v-icon>mdi-account-circle</v-icon>
           </v-btn>
         </template>

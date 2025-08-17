@@ -64,19 +64,14 @@ export interface HallUpdate extends Partial<HallCreate> {}
 export interface ActivityType {
   id: string
   name: string
-  category?: string
-  description?: string
-  estimatedDuration?: number
-  requiredEquipment?: string
-  status: 'active' | 'blocked'
+  createAt: string
+  updatedAt?: string
+  status: number // 1 = active, 3 = blocked
 }
 
 export interface ActivityTypeCreate {
   name: string
-  category?: string
-  description?: string
-  estimatedDuration?: number
-  requiredEquipment?: string
+  status: number
 }
 
 export interface ActivityTypeUpdate extends Partial<ActivityTypeCreate> {}

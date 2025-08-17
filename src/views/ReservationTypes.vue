@@ -4,41 +4,63 @@
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-space-between align-center mb-6">
-            <h1 class="text-h3">إدارة أنواع الحجوزات</h1>
+            <h1 class="text-h3">إدارة أنواع الأنشطة</h1>
             <v-btn color="primary" prepend-icon="mdi-plus" @click="showCreateDialog = true">
-              إضافة نوع جديد
+              إضافة نوع نشاط جديد
             </v-btn>
           </div>
         </v-col>
       </v-row>
 
-      <!-- Search -->
+      <!-- Search and Filters -->
       <v-row>
         <v-col cols="12" md="6">
           <v-text-field
             v-model="search"
-            label="البحث في الأنواع..."
+            label="البحث في أنواع الأنشطة..."
             prepend-icon="mdi-magnify"
             variant="outlined"
             density="compact"
             clearable
           ></v-text-field>
         </v-col>
+        <v-col cols="12" md="3">
+          <v-select
+            v-model="statusFilter"
+            label="الحالة"
+            :items="statusOptions"
+            variant="outlined"
+            density="compact"
+            clearable
+            @update:model-value="handleStatusFilterChange"
+          ></v-select>
+        </v-col>
       </v-row>
 
-      <!-- Reservation Types Table -->
+      <!-- Activity Types Table -->
       <v-card>
         <v-data-table
           :headers="headers"
-          :items="filteredReservationTypes"
+          :items="filteredActivityTypes"
           :loading="loading"
           :search="search"
+          :items-per-page="itemsPerPage"
+          :page="currentPage"
+          :total="totalRecords"
           class="elevation-1"
         >
           <template v-slot:item.status="{ item }">
-            <v-chip :color="item.status === 'active' ? 'success' : 'error'" size="small">
-              {{ item.status === 'active' ? 'نشط' : 'محظور' }}
+            <v-chip :color="item.status === 1 ? 'success' : 'error'" size="small">
+              {{ item.status === 1 ? 'نشط' : 'محظور' }}
             </v-chip>
+          </template>
+
+          <template v-slot:item.createAt="{ item }">
+            <span>{{ formatDate(item.createAt) }}</span>
+          </template>
+
+          <template v-slot:item.updatedAt="{ item }">
+            <span>{{ item.updatedAt ? formatDate(item.updatedAt) : 'لم يتم التحديث' }}</span>
           </template>
 
           <template v-slot:item.actions="{ item }">
@@ -47,72 +69,69 @@
               size="small"
               variant="text"
               color="warning"
-              @click="editReservationType(item)"
-              title="تعديل النوع"
+              @click="editActivityType(item)"
+              title="تعديل نوع النشاط"
             ></v-btn>
             <v-btn
               icon="mdi-block-helper"
               size="small"
               variant="text"
-              :color="item.status === 'active' ? 'error' : 'success'"
-              @click="toggleReservationTypeStatus(item)"
-              :title="item.status === 'active' ? 'حظر النوع' : 'إلغاء حظر النوع'"
+              :color="item.status === 1 ? 'error' : 'success'"
+              @click="toggleActivityTypeStatus(item)"
+              :title="item.status === 1 ? 'حظر النوع' : 'إلغاء حظر النوع'"
             ></v-btn>
           </template>
         </v-data-table>
+
+        <!-- Pagination Controls -->
+        <v-card-actions class="d-flex justify-center">
+          <v-pagination
+            v-model="currentPage"
+            :length="totalPages"
+            :total-visible="7"
+            @update:model-value="handlePageChange"
+          ></v-pagination>
+        </v-card-actions>
       </v-card>
 
-      <!-- Create/Edit Dialog -->
-      <v-dialog v-model="showCreateDialog" max-width="500">
+      <!-- Create/Edit Activity Type Dialog -->
+      <v-dialog v-model="showCreateDialog" max-width="600">
         <v-card>
           <v-card-title>
-            {{ editingReservationType ? 'تعديل نوع الحجز' : 'إنشاء نوع جديد' }}
+            {{ editingActivityType ? 'تعديل نوع النشاط' : 'إنشاء نوع نشاط جديد' }}
           </v-card-title>
           <v-card-text>
-            <v-form @submit.prevent="saveReservationType" v-model="isValid">
-              <v-text-field
-                v-model="reservationTypeForm.name"
-                label="اسم النوع"
-                :rules="[(v) => !!v || 'الاسم مطلوب']"
-                required
-                variant="outlined"
-                class="mb-4"
-              ></v-text-field>
-
-              <v-textarea
-                v-model="reservationTypeForm.description"
-                label="الوصف"
-                variant="outlined"
-                rows="3"
-                class="mb-4"
-              ></v-textarea>
-
-              <v-text-field
-                v-model="reservationTypeForm.duration"
-                label="المدة الافتراضية (ساعات)"
-                type="number"
-                variant="outlined"
-                class="mb-4"
-              ></v-text-field>
-
-              <v-text-field
-                v-model="reservationTypeForm.maxCapacity"
-                label="السعة القصوى"
-                type="number"
-                variant="outlined"
-              ></v-text-field>
+            <v-form @submit.prevent="saveActivityType" v-model="isValid">
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="activityTypeForm.name"
+                    label="اسم نوع النشاط"
+                    :rules="[(v) => !!v || 'الاسم مطلوب']"
+                    required
+                    variant="outlined"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-select
+                    v-model="activityTypeForm.status"
+                    label="الحالة"
+                    :items="statusOptions"
+                    item-title="title"
+                    item-value="value"
+                    :rules="[(v) => !!v || 'الحالة مطلوبة']"
+                    required
+                    variant="outlined"
+                  ></v-select>
+                </v-col>
+              </v-row>
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn variant="text" @click="showCreateDialog = false"> إلغاء </v-btn>
-            <v-btn
-              color="primary"
-              @click="saveReservationType"
-              :loading="saving"
-              :disabled="!isValid"
-            >
-              {{ editingReservationType ? 'تحديث' : 'إنشاء' }}
+            <v-btn color="primary" @click="saveActivityType" :loading="saving" :disabled="!isValid">
+              {{ editingActivityType ? 'تحديث' : 'إنشاء' }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -124,104 +143,145 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
-import { reservationTypesAPI } from '@/services/api'
-import type { ReservationType, ReservationTypeCreate } from '@/types'
+import { activityTypesAPI } from '@/services/api'
+import type { ActivityType, ActivityTypeCreate } from '@/types'
 
 // Data
-const reservationTypes = ref<ReservationType[]>([])
+const activityTypes = ref<ActivityType[]>([])
 const loading = ref(false)
 const saving = ref(false)
 const search = ref('')
+const statusFilter = ref<number | ''>('')
+
+// Pagination
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
+const totalRecords = ref(0)
 
 // Dialogs
 const showCreateDialog = ref(false)
-const editingReservationType = ref<ReservationType | null>(null)
+const editingActivityType = ref<ActivityType | null>(null)
 
 // Form
-const reservationTypeForm = reactive<ReservationTypeCreate>({
+const activityTypeForm = reactive<ActivityTypeCreate>({
   name: '',
-  description: '',
-  duration: 0,
-  maxCapacity: 0,
+  status: 1,
 })
 
 const isValid = ref(false)
 
 // Table headers
-const headers = [
-  { title: 'الاسم', key: 'name', sortable: true },
-  { title: 'الوصف', key: 'description', sortable: false },
-  { title: 'المدة (ساعات)', key: 'duration', sortable: true },
-  { title: 'السعة القصوى', key: 'maxCapacity', sortable: true },
-  { title: 'الحالة', key: 'status', sortable: true },
-  { title: 'الإجراءات', key: 'actions', sortable: false },
+const headers: Array<{
+  title: string
+  key: string
+  sortable: boolean
+  align?: 'start' | 'center' | 'end'
+}> = [
+  { title: 'الاسم', key: 'name', sortable: true, align: 'center' },
+  { title: 'الحالة', key: 'status', sortable: true, align: 'center' },
+  { title: 'تاريخ الإنشاء', key: 'createAt', sortable: true, align: 'center' },
+  { title: 'آخر تحديث', key: 'updatedAt', sortable: true, align: 'center' },
+  { title: 'الإجراءات', key: 'actions', sortable: false, align: 'center' },
+]
+
+// Filter options
+const statusOptions = [
+  { title: 'نشط', value: 1 },
+  { title: 'محظور', value: 3 },
 ]
 
 // Computed
-const filteredReservationTypes = computed(() => {
-  return reservationTypes.value
+const filteredActivityTypes = computed(() => {
+  let filtered = activityTypes.value
+
+  if (statusFilter.value !== '') {
+    filtered = filtered.filter((type) => type.status === statusFilter.value)
+  }
+
+  return filtered
 })
 
+const totalPages = computed(() => Math.ceil(totalRecords.value / itemsPerPage.value))
+
 // Methods
-const fetchReservationTypes = async () => {
+const fetchActivityTypes = async (page: number = 1) => {
   try {
     loading.value = true
-    const response = await reservationTypesAPI.getAll()
-    reservationTypes.value = response.data
+    const response = await activityTypesAPI.getAll({
+      page,
+      limit: itemsPerPage.value,
+      status: statusFilter.value || undefined,
+    })
+    activityTypes.value = response.data.data
+    totalRecords.value = response.data.totalRecords
+    currentPage.value = page
   } catch (error) {
-    console.error('Error fetching reservation types:', error)
+    console.error('Error fetching activity types:', error)
   } finally {
     loading.value = false
   }
 }
 
-const saveReservationType = async () => {
+const handlePageChange = (page: number) => {
+  fetchActivityTypes(page)
+}
+
+const handleStatusFilterChange = () => {
+  currentPage.value = 1
+  fetchActivityTypes(1)
+}
+
+const saveActivityType = async () => {
   try {
     saving.value = true
 
-    if (editingReservationType.value) {
-      await reservationTypesAPI.update(editingReservationType.value.id, reservationTypeForm)
+    if (editingActivityType.value) {
+      await activityTypesAPI.update(editingActivityType.value.id, activityTypeForm)
     } else {
-      await reservationTypesAPI.create(reservationTypeForm)
+      await activityTypesAPI.create(activityTypeForm)
     }
 
     showCreateDialog.value = false
     resetForm()
-    fetchReservationTypes()
+    fetchActivityTypes(currentPage.value)
   } catch (error) {
-    console.error('Error saving reservation type:', error)
+    console.error('Error saving activity type:', error)
   } finally {
     saving.value = false
   }
 }
 
-const editReservationType = (reservationType: ReservationType) => {
-  editingReservationType.value = reservationType
-  Object.assign(reservationTypeForm, reservationType)
+const editActivityType = (activityType: ActivityType) => {
+  editingActivityType.value = activityType
+  Object.assign(activityTypeForm, activityType)
   showCreateDialog.value = true
 }
 
-const toggleReservationTypeStatus = async (reservationType: ReservationType) => {
+const toggleActivityTypeStatus = async (activityType: ActivityType) => {
   try {
-    await reservationTypesAPI.block(reservationType.id)
-    fetchReservationTypes()
+    const newStatus = activityType.status === 1 ? 3 : 1
+    await activityTypesAPI.update(activityType.id, { status: newStatus })
+    fetchActivityTypes(currentPage.value)
   } catch (error) {
-    console.error('Error toggling reservation type status:', error)
+    console.error('Error toggling activity type status:', error)
   }
 }
 
 const resetForm = () => {
-  editingReservationType.value = null
-  Object.assign(reservationTypeForm, {
+  editingActivityType.value = null
+  Object.assign(activityTypeForm, {
     name: '',
-    description: '',
-    duration: 0,
-    maxCapacity: 0,
+    status: 1,
   })
 }
 
+const formatDate = (dateString: string) => {
+  if (!dateString) return ''
+  return new Date(dateString).toLocaleDateString('ar-SA')
+}
+
 onMounted(() => {
-  fetchReservationTypes()
+  fetchActivityTypes(1)
 })
 </script>
 
