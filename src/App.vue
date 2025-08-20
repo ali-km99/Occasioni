@@ -1,5 +1,18 @@
 <script setup lang="ts">
-// The router-view will handle all the routing
+import { onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+
+onMounted(async () => {
+  if (authStore.token) {
+    try {
+      await authStore.fetchMe()
+    } catch (e) {
+      console.error('فشل جلب بيانات المستخدم:', e)
+    }
+  }
+})
 </script>
 
 <template>

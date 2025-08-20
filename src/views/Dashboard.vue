@@ -157,7 +157,7 @@ const fetchDashboardData = async () => {
     stats.value = {
       totalHalls: hallsResponse.data.totalRecords,
       totalUsers: usersResponse.data.length,
-      totalActivities: activitiesResponse.data.length,
+      totalActivities: activitiesResponse.data.totalRecords,
       activeReservations: 0, // TODO: Implement reservations API
     }
 

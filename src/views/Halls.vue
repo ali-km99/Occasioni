@@ -72,8 +72,11 @@
           </template>
 
           <template v-slot:item.status="{ item }">
-            <v-chip :color="item.status === 1 ? 'success' : 'error'" size="small">
-              {{ item.status === 1 ? 'نشط' : 'محظور' }}
+            <v-chip
+              :color="item.status === 1 ? 'success' : item.status === 3 ? 'warning' : 'error'"
+              size="small"
+            >
+              {{ item.status === 1 ? 'نشط' : item.status === 3 ? 'مغلق' : 'محظور' }}
             </v-chip>
           </template>
 
@@ -102,9 +105,17 @@
               icon="mdi-block-helper"
               size="small"
               variant="text"
-              :color="item.status === 1 ? 'error' : 'success'"
-              @click="toggleHallStatus(item)"
+              :color="item.status === 1 ? 'warning' : 'success'"
+              @click="toggleHallStatus(item, item.status === 1 ? 2 : 1)"
               :title="item.status === 1 ? 'حظر القاعة' : 'إلغاء حظر القاعة'"
+            ></v-btn>
+            <v-btn
+              icon="mdi-delete"
+              size="small"
+              variant="text"
+              :color="item.status === 1 ? 'error' : 'success'"
+              @click="toggleHallStatus(item, 3)"
+              :title="item.status === 1 ? 'غلق القاعة' : ' إلغاء غلق القاعة'"
             ></v-btn>
           </template>
         </v-data-table>
@@ -326,7 +337,8 @@ const headers: Array<{
 // Filter options
 const statusOptions = [
   { title: 'نشط', value: 1 },
-  { title: 'محظور', value: 3 },
+  { title: 'محظور', value: 2 },
+  { title: 'مغلق', value: 3 },
 ]
 
 // Computed
@@ -420,9 +432,9 @@ const viewHall = (hall: Hall) => {
   showDetailsDialog.value = true
 }
 
-const toggleHallStatus = async (hall: Hall) => {
+const toggleHallStatus = async (hall: Hall, type: number) => {
   try {
-    await hallsAPI.block(hall.id)
+    await hallsAPI.block(hall.id, type)
     fetchHalls(currentPage.value)
   } catch (error) {
     console.error('Error toggling hall status:', error)

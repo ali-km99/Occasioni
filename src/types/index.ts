@@ -66,7 +66,7 @@ export interface ActivityType {
   name: string
   createAt: string
   updatedAt?: string
-  status: number // 1 = active, 3 = blocked
+  status: number // 1 = active, 2 = blocked , 3 = deleted
 }
 
 export interface ActivityTypeCreate {

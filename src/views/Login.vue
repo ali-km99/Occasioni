@@ -1,7 +1,11 @@
 <template>
-  <div class="login-container">
-    <v-card class="login-card" max-width="400">
-      <v-card-title class="text-center text-h4 mb-4"> إدارة حجز القاعات </v-card-title>
+  <div class="login-wrapper">
+    <!-- Canvas الخلفية المتحركة -->
+    <canvas ref="canvas" class="background-canvas"></canvas>
+
+    <!-- بطاقة تسجيل الدخول -->
+    <v-card class="login-card p-4" max-width="400" min-width="400">
+      <v-card-title class="text-center text-h4 mb-4">إدارة حجز القاعات</v-card-title>
 
       <v-card-subtitle class="text-center text-body-1 mb-6">
         تسجيل الدخول إلى حسابك
@@ -18,7 +22,7 @@
             required
             variant="outlined"
             class="mb-4"
-          ></v-text-field>
+          />
 
           <v-text-field
             v-model="form.password"
@@ -29,7 +33,7 @@
             required
             variant="outlined"
             class="mb-6"
-          ></v-text-field>
+          />
 
           <v-btn
             type="submit"
@@ -54,11 +58,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { authAPI } from '@/services/api'
-import type { User } from '@/types'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -71,6 +74,7 @@ const form = reactive({
 const isValid = ref(false)
 const isLoading = ref(false)
 const error = ref('')
+const canvas = ref<HTMLCanvasElement | null>(null)
 
 const emailRules = [
   (v: string) => !!v || 'البريد الإلكتروني مطلوب',
@@ -91,10 +95,12 @@ const handleLogin = async () => {
       username: form.username,
       password: form.password,
     })
-    const { token, user } = response.data
+    const { token } = response.data
 
     authStore.setToken(token)
-    authStore.setUser(user)
+
+    // ✅ بعد تسجيل الدخول مباشرة نجيب بيانات المستخدم
+    await authStore.fetchMe()
 
     router.push('/dashboard')
   } catch (err: any) {
@@ -103,20 +109,89 @@ const handleLogin = async () => {
     isLoading.value = false
   }
 }
+
+/* 🎇 إنشاء النقاط المضيئة */
+onMounted(() => {
+  const c = canvas.value
+  if (!c) return
+  const ctx = c.getContext('2d') as CanvasRenderingContext2D
+
+  let particles: { x: number; y: number; r: number; dx: number; dy: number }[] = []
+  const numParticles = 80
+
+  const resizeCanvas = () => {
+    c.width = window.innerWidth
+    c.height = window.innerHeight
+    particles = Array.from({ length: numParticles }, () => ({
+      x: Math.random() * c.width,
+      y: Math.random() * c.height,
+      r: Math.random() * 3 + 1,
+      dx: (Math.random() - 0.5) * 1,
+      dy: (Math.random() - 0.5) * 1,
+    }))
+  }
+
+  const draw = () => {
+    ctx.fillStyle = '#0a0f1f' // خلفية أزرق داكن
+    ctx.fillRect(0, 0, c.width, c.height)
+
+    ctx.fillStyle = 'white'
+    ctx.shadowColor = '#66aaff'
+    ctx.shadowBlur = 15
+
+    particles.forEach((p) => {
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+      ctx.fill()
+
+      p.x += p.dx
+      p.y += p.dy
+
+      // ارتداد عن الحواف
+      if (p.x < 0 || p.x > c.width) p.dx *= -1
+      if (p.y < 0 || p.y > c.height) p.dy *= -1
+    })
+
+    requestAnimationFrame(draw)
+  }
+
+  resizeCanvas()
+  draw()
+  window.addEventListener('resize', resizeCanvas)
+})
 </script>
 
 <style scoped>
-.login-container {
+.login-wrapper {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Canvas الخلفية */
+.background-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* بطاقة تسجيل الدخول بزجاجية */
 .login-card {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
+  padding: 5px 20px;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  color: white;
 }
 </style>

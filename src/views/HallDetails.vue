@@ -310,7 +310,7 @@ const toggleStatus = async () => {
   if (!hall.value) return
 
   try {
-    await hallsAPI.block(hall.value.id)
+    await hallsAPI.block(hall.value.id, 2)
     await fetchHallDetails()
   } catch (error) {
     console.error('Error toggling hall status:', error)

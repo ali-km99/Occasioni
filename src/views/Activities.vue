@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="12">
           <div class="d-flex justify-space-between align-center mb-6">
-            <h1 class="text-h3">إداره أنواع الأنشطة</h1>
+            <h1 class="text-h3">إداره أنواع الحجوزات</h1>
             <v-btn color="primary" prepend-icon="mdi-plus" @click="showCreateDialog = true">
               إضافة نشاط جديد
             </v-btn>
@@ -36,8 +36,8 @@
           class="elevation-1"
         >
           <template v-slot:item.status="{ item }">
-            <v-chip :color="item.status === 'active' ? 'success' : 'error'" size="small">
-              {{ item.status === 'active' ? 'نشط' : 'محظور' }}
+            <v-chip :color="item.status === 1 ? 'success' : 'error'" size="small">
+              {{ item.status === 1 ? 'نشط' : 'محظور' }}
             </v-chip>
           </template>
 
@@ -54,9 +54,9 @@
               icon="mdi-block-helper"
               size="small"
               variant="text"
-              :color="item.status === 'active' ? 'error' : 'success'"
+              :color="item.status === 1 ? 'error' : 'success'"
               @click="toggleActivityTypeStatus(item)"
-              :title="item.status === 'active' ? 'حظر النشاط' : 'إلغاء حظر النشاط'"
+              :title="item.status === 1 ? 'حظر النشاط' : 'إلغاء حظر النشاط'"
             ></v-btn>
           </template>
         </v-data-table>
@@ -79,7 +79,7 @@
                 class="mb-4"
               ></v-text-field>
 
-              <v-textarea
+              <!-- <v-textarea
                 v-model="activityTypeForm.description"
                 label="الوصف"
                 variant="outlined"
@@ -107,7 +107,7 @@
                 label="المعدات المطلوبة"
                 variant="outlined"
                 hint="افصل بين العناصر المتعددة بفواصل"
-              ></v-text-field>
+              ></v-text-field> -->
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -127,7 +127,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
 import { activityTypesAPI } from '@/services/api'
-import type { ActivityType, ActivityTypeCreate } from '@/types'
+import type { ActivityType, ActivityTypeCreate, PaginatedResponse } from '@/types'
 
 // Data
 const activityTypes = ref<ActivityType[]>([])
@@ -139,13 +139,15 @@ const search = ref('')
 const showCreateDialog = ref(false)
 const editingActivityType = ref<ActivityType | null>(null)
 
+// Pagination
+const currentPage = ref<number>(1)
+const itemsPerPage = ref(10)
+const totalRecords = ref(0)
+
 // Form
 const activityTypeForm = reactive<ActivityTypeCreate>({
   name: '',
-  category: '',
-  description: '',
-  estimatedDuration: 0,
-  requiredEquipment: '',
+  status: 1,
 })
 
 const isValid = ref(false)
@@ -167,11 +169,14 @@ const filteredActivityTypes = computed(() => {
 })
 
 // Methods
-const fetchActivityTypes = async () => {
+const fetchActivityTypes = async (page: number) => {
   try {
     loading.value = true
-    const response = await activityTypesAPI.getAll()
-    activityTypes.value = response.data
+    const response = await activityTypesAPI.getAll({
+      page,
+      limit: itemsPerPage.value,
+    })
+    activityTypes.value = response.data.data
   } catch (error) {
     console.error('Error fetching activity types:', error)
   } finally {
@@ -191,7 +196,7 @@ const saveActivityType = async () => {
 
     showCreateDialog.value = false
     resetForm()
-    fetchActivityTypes()
+    fetchActivityTypes(currentPage.value)
   } catch (error) {
     console.error('Error saving activity type:', error)
   } finally {
@@ -207,8 +212,9 @@ const editActivityType = (activityType: ActivityType) => {
 
 const toggleActivityTypeStatus = async (activityType: ActivityType) => {
   try {
-    await activityTypesAPI.block(activityType.id)
-    fetchActivityTypes()
+    const newStatus = activityType.status === 1 ? 3 : 1
+    await activityTypesAPI.block(activityType.id, newStatus)
+    fetchActivityTypes(currentPage.value)
   } catch (error) {
     console.error('Error toggling activity type status:', error)
   }
@@ -226,7 +232,7 @@ const resetForm = () => {
 }
 
 onMounted(() => {
-  fetchActivityTypes()
+  fetchActivityTypes(currentPage.value)
 })
 </script>
 

@@ -79,7 +79,7 @@ export const hallsAPI = {
   create: (data: HallCreate) => api.post<Hall>('/hall', data),
   update: (id: string, data: HallUpdate) => api.patch<Hall>(`/hall/${id}`, data),
   delete: (id: string) => api.delete(`/hall/${id}`),
-  block: (id: string) => api.post(`/hall/${id}/block`),
+  block: (id: string, type: number) => api.post(`/hall/${id}/block`, { type }),
 
   // Hall images and attachments
   uploadImage: (id: string, file: File) => {
@@ -127,7 +127,7 @@ export const activityTypesAPI = {
   update: (id: string, data: ActivityTypeCreate) =>
     api.patch<ActivityType>(`/typeOfActivities/${id}`, data),
   delete: (id: string) => api.delete(`/typeOfActivities/${id}`),
-  block: (id: string) => api.post(`/typeOfActivities/${id}/block`),
+  block: (id: string, type: number) => api.post(`/typeOfActivities/${id}/block`, { type }),
 }
 
 // Users API

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User } from '@/types'
+import { authAPI } from '@/services/api'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -33,6 +34,19 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('token')
   }
 
+  /** ✅ جلب بيانات المستخدم عبر api/auth/me */
+  const fetchMe = async () => {
+    if (!token.value) return null
+    try {
+      const response = await authAPI.me()
+      setUser(response.data)
+      return response.data
+    } catch (error) {
+      clearAuth()
+      throw error
+    }
+  }
+
   return {
     token,
     user,
@@ -41,5 +55,6 @@ export const useAuthStore = defineStore('auth', () => {
     setUser,
     logout,
     clearAuth,
+    fetchMe, // ← أضفناها
   }
 })

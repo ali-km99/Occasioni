@@ -56,7 +56,7 @@
           </template>
 
           <template v-slot:item.createAt="{ item }">
-            <span>{{ formatDate(item.createAt) }}</span>
+            <span dir="rtl">{{ formatDate(item.createAt) }}</span>
           </template>
 
           <template v-slot:item.updatedAt="{ item }">
@@ -260,7 +260,7 @@ const editActivityType = (activityType: ActivityType) => {
 const toggleActivityTypeStatus = async (activityType: ActivityType) => {
   try {
     const newStatus = activityType.status === 1 ? 3 : 1
-    await activityTypesAPI.update(activityType.id, { status: newStatus })
+    await activityTypesAPI.block(activityType.id, newStatus)
     fetchActivityTypes(currentPage.value)
   } catch (error) {
     console.error('Error toggling activity type status:', error)
@@ -277,7 +277,11 @@ const resetForm = () => {
 
 const formatDate = (dateString: string) => {
   if (!dateString) return ''
-  return new Date(dateString).toLocaleDateString('ar-SA')
+  return new Date(dateString).toLocaleDateString('ar-LY', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  })
 }
 
 onMounted(() => {
