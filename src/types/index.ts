@@ -59,7 +59,12 @@ export interface HallCreate {
 }
 
 export interface HallUpdate extends Partial<HallCreate> {}
-
+export interface HallAttachment {
+  id: string
+  hallId: string
+  status: number
+  path: string
+}
 // Activity Type interfaces
 export interface ActivityType {
   id: string

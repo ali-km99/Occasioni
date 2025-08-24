@@ -19,7 +19,7 @@ import type {
 // Create axios instance
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://occasioni.fexpress.ly/api',
-  timeout: 10000,
+  timeout: 20000,
 })
 
 // Request interceptor to add auth token
@@ -82,15 +82,20 @@ export const hallsAPI = {
   block: (id: string, type: number) => api.post(`/hall/${id}/block`, { type }),
 
   // Hall images and attachments
-  uploadImage: (id: string, file: File) => {
+  uploadHallImage: (hallId: string, file: File) => {
     const formData = new FormData()
-    formData.append('image', file)
-    return api.post(`/hall/${id}/hallImage`, formData)
+    formData.append('file', file, file.name) // file هو فعلاً File object
+    return api.post(`/Hall/${hallId}/HallImage`, formData)
   },
-  uploadAttachments: (id: string, files: File[]) => {
-    const formData = new FormData()
-    files.forEach((file) => formData.append('attachments', file))
-    return api.post(`/hall/${id}/hallAttachments`, formData)
+  uploadAttachments: (id: string, formData: FormData) => {
+    return api.post(`/Hall/${id}/HallAttachments`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+  },
+  getHallAttachments: (hallId: string) => {
+    return api.get(`/Hall/${hallId}/HallAttachments`)
   },
 
   // Hall user management
@@ -121,6 +126,10 @@ export const activityTypesAPI = {
     const queryString = queryParams.toString()
     const url = queryString ? `/typeOfActivities/all?${queryString}` : '/typeOfActivities/all'
     return api.get<PaginatedResponse<ActivityType>>(url)
+  },
+  getActivitys: (name?: string) => {
+    const url = name ? `/typeOfActivities?name=${encodeURIComponent(name)}` : `/typeOfActivities`
+    return api.get<ActivityType[]>(url)
   },
   getById: (id: string) => api.get<ActivityType>(`/typeOfActivities/${id}`),
   create: (data: ActivityTypeCreate) => api.post<ActivityType>('/typeOfActivities', data),
