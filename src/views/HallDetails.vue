@@ -134,7 +134,7 @@
           </v-card>
 
           <!-- Hall Attachments -->
-          <v-card class="mb-6">
+          <!-- <v-card class="mb-6">
             <v-card-title class="d-flex justify-space-between align-center">
               مرفقات القاعة
               <v-btn
@@ -174,7 +174,7 @@
                 </v-list-item>
               </v-list>
             </v-card-text>
-          </v-card>
+          </v-card> -->
         </v-col>
 
         <!-- Sidebar -->
@@ -324,7 +324,7 @@ const handleImageUpload = async (event: Event) => {
   const file = target.files?.[0]
   if (file) {
     try {
-      await hallsAPI.uploadImage(hall.value.id, file)
+      await hallsAPI.uploadHallImage(hall.value.id, file)
       await fetchHallDetails()
     } catch (error) {
       console.error('Error uploading image:', error)
@@ -332,20 +332,20 @@ const handleImageUpload = async (event: Event) => {
   }
 }
 
-const handleAttachmentUpload = async (event: Event) => {
-  if (!hall.value) return
+// const handleAttachmentUpload = async (event: Event) => {
+//   if (!hall.value) return
 
-  const target = event.target as HTMLInputElement
-  const files = Array.from(target.files || [])
-  if (files.length > 0) {
-    try {
-      await hallsAPI.uploadAttachments(hall.value.id, files)
-      await fetchHallDetails()
-    } catch (error) {
-      console.error('Error uploading attachments:', error)
-    }
-  }
-}
+//   const target = event.target as HTMLInputElement
+//   const files = Array.from(target.files || [])
+//   if (files.length > 0) {
+//     try {
+//       await hallsAPI.uploadAttachments(hall.value.id, files)
+//       await fetchHallDetails()
+//     } catch (error) {
+//       console.error('Error uploading attachments:', error)
+//     }
+//   }
+// }
 
 const removeImage = (index: number) => {
   if (hall.value?.images) {
