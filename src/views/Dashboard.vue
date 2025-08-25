@@ -149,15 +149,15 @@ const fetchDashboardData = async () => {
 
     // Fetch statistics
     const [hallsResponse, usersResponse, activitiesResponse] = await Promise.all([
-      hallsAPI.getAll(),
+      hallsAPI.getAll({ page: 1, limit: 99 }),
       usersAPI.getAll(),
-      activityTypesAPI.getAll(),
+      activityTypesAPI.getActivitys(),
     ])
 
     stats.value = {
       totalHalls: hallsResponse.data.totalRecords,
       totalUsers: usersResponse.data.length,
-      totalActivities: activitiesResponse.data.totalRecords,
+      totalActivities: activitiesResponse.data.length,
       activeReservations: 0, // TODO: Implement reservations API
     }
 
