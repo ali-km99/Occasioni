@@ -33,15 +33,15 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/reservation-types',
-      name: 'ReservationTypes',
-      component: () => import('@/views/ReservationTypes.vue'),
+      path: '/activities-types',
+      name: 'ActivitiesTypes',
+      component: () => import('@/views/ActivitiesTypes.vue'),
       meta: { requiresAuth: true },
     },
     {
-      path: '/activities',
-      name: 'Activities',
-      component: () => import('@/views/Activities.vue'),
+      path: '/reservation-types',
+      name: 'ReservationTypes',
+      component: () => import('@/views/ReservationTypes.vue'),
       meta: { requiresAuth: true },
     },
     {

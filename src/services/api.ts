@@ -106,13 +106,22 @@ export const hallsAPI = {
 
 // Reservation Types API
 export const reservationTypesAPI = {
-  getAll: () => api.get<ReservationType[]>('/ReservationType'),
+  getAll: (params?: { page?: number; limit?: number; name?: string }) => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.name) queryParams.append('status', params.name.toString())
+
+    const queryString = queryParams.toString()
+    const url = queryString ? `/ReservationType/all?${queryString}` : '/typeOfActivities/all'
+    return api.get<PaginatedResponse<ReservationType>>(url)
+  },
   getById: (id: string) => api.get<ReservationType>(`/ReservationType/${id}`),
   create: (data: ReservationTypeCreate) => api.post<ReservationType>('/ReservationType', data),
   update: (id: string, data: ReservationTypeUpdate) =>
     api.patch<ReservationType>(`/ReservationType/${id}`, data),
   delete: (id: string) => api.delete(`/ReservationType/${id}`),
-  block: (id: string) => api.post(`/ReservationType/${id}/block`),
+  block: (id: string, type: number) => api.post(`/ReservationType/${id}/block`, { type }),
 }
 
 // Activity Types API

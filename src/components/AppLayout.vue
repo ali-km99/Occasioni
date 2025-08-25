@@ -33,17 +33,17 @@
         ></v-list-item>
 
         <v-list-item
-          prepend-icon="mdi-view-dashboard"
-          title="أنواع الأنشطة"
+          prepend-icon="mdi-calendar-clock"
+          title="انواع الحجوزات"
           value="reservation-types"
           to="/reservation-types"
         ></v-list-item>
 
         <v-list-item
-          prepend-icon="mdi-calendar-clock"
-          title="انواع الحجوزات"
-          value="activities"
-          to="/activities"
+          prepend-icon="mdi-view-dashboard"
+          title="أنواع الأنشطة"
+          value="activities-types"
+          to="/activities-types"
         ></v-list-item>
 
         <v-list-item

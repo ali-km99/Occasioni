@@ -85,10 +85,9 @@ export interface ActivityTypeUpdate extends Partial<ActivityTypeCreate> {}
 export interface ReservationType {
   id: string
   name: string
-  description?: string
-  duration?: number
-  maxCapacity?: number
-  status: 'active' | 'blocked'
+  createAt: string
+  updatedAt?: string
+  status: number // 1 = active, 2 = blocked , 3 = deleted
 }
 
 export interface ReservationTypeCreate {
